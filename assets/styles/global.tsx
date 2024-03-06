@@ -16,8 +16,9 @@ export const globalStyles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: 70,
+    // paddingTop: 70,
     paddingHorizontal: 28,
     backgroundColor: Colors.secondary,
+    justifyContent: "center",
   },
 });

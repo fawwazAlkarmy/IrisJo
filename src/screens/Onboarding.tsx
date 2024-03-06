@@ -2,12 +2,33 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../assets/styles/global";
 import { Colors } from "../../utils/colors";
 import { AntDesign } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { Camera, CameraType } from "expo-camera";
+import { useState } from "react";
+
 const Onboarding = () => {
+  const [image, setImage] = useState<string | null>(null);
+  //! function to handle image selection from gallery
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
   return (
     <>
       <View style={globalStyles.container}>
         <Text style={[globalStyles.boldFont, styles.name]}>
           <Text style={styles.iris}>Iris</Text>
+          <Text style={styles.iris}> </Text>
           Jo
         </Text>
         <Text style={[globalStyles.regularFont, styles.subHeading]}>
@@ -19,16 +40,28 @@ const Onboarding = () => {
             source={require("../../assets/images/bg.jpg")}
           />
         </View>
-        <View style={styles.btnArrowContainer}>
+        <View style={styles.buttonsContainer}>
           <Pressable style={styles.button}>
             <Text style={[globalStyles.semiBoldFont, styles.buttonText]}>
               Scan Plants
             </Text>
-            <AntDesign name="scan1" size={18} color="white" />
+            <AntDesign name="scan1" size={17} color="white" />
           </Pressable>
-          {/* <View style={styles.iconContainer}>
-            <AntDesign name="arrowright" size={18} color="white" />
-          </View> */}
+          <Pressable
+            style={[styles.button, styles.secondaryButton]}
+            onPress={pickImage}
+          >
+            <Text
+              style={[
+                globalStyles.semiBoldFont,
+                styles.buttonText,
+                styles.secondaryButtonText,
+              ]}
+            >
+              Choose from gallery
+            </Text>
+            <AntDesign name="camera" size={17} color="black" />
+          </Pressable>
         </View>
       </View>
     </>
@@ -51,27 +84,32 @@ const styles = StyleSheet.create({
     width: 360,
     height: 250,
   },
-  btnArrowContainer: {
+  buttonsContainer: {
     marginTop: 120,
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
   },
   button: {
     backgroundColor: Colors.primary,
     padding: 10,
     borderRadius: 5,
-    width: 150,
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
+    gap: 10,
+  },
+  secondaryButton: {
+    backgroundColor: Colors.secondary,
+    borderWidth: 1,
+    borderColor: Colors.text,
+  },
+  secondaryButtonText: {
+    color: Colors.text,
   },
   buttonText: {
     textAlign: "center",
     color: Colors.white,
-  },
-  iconContainer: {
-    padding: 10,
-    backgroundColor: Colors.text,
-    borderRadius: 15,
-    borderTopLeftRadius: 0,
+    fontSize: 13,
   },
 });
