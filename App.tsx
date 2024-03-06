@@ -1,20 +1,40 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import { useCallback, useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import StackNavigator from "./src/navigation/StackNavigator";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    Black: require("./assets/fonts/Montserrat-Black.ttf"),
+    Bold: require("./assets/fonts/Montserrat-Bold.ttf"),
+    Medium: require("./assets/fonts/Montserrat-Medium.ttf"),
+    Regular: require("./assets/fonts/Montserrat-Regular.ttf"),
+    SemiBold: require("./assets/fonts/Montserrat-SemiBold.ttf"),
+    light: require("./assets/fonts/Montserrat-Light.ttf"),
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    await SplashScreen.hideAsync();
+  }, []);
+
+  useEffect(() => {
+    onLayoutRootView();
+  }, [onLayoutRootView]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer>
+        <StackNavigator />
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
