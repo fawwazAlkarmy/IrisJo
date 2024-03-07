@@ -1,14 +1,20 @@
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Button, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../assets/styles/global";
 import { Colors } from "../../utils/colors";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { Camera, CameraType } from "expo-camera";
 import { useState } from "react";
+import { RootStackParamList } from "../../utils/types";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const Onboarding = () => {
+type Props = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Onboarding">;
+};
+
+const Onboarding = ({ navigation }: Props) => {
   const [image, setImage] = useState<string | null>(null);
-  //! function to handle image selection from gallery
+
+  //* function to handle image selection from gallery
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -17,12 +23,15 @@ const Onboarding = () => {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
+
+  const handlePress = () => {
+    navigation.navigate("Camera");
+  };
+
   return (
     <>
       <View style={globalStyles.container}>
@@ -41,7 +50,7 @@ const Onboarding = () => {
           />
         </View>
         <View style={styles.buttonsContainer}>
-          <Pressable style={styles.button}>
+          <Pressable style={styles.button} onPress={handlePress}>
             <Text style={[globalStyles.semiBoldFont, styles.buttonText]}>
               Scan Plants
             </Text>
