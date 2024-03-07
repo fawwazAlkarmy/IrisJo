@@ -3,16 +3,17 @@ import { globalStyles } from "../../assets/styles/global";
 import { Colors } from "../../utils/colors";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
 import { RootStackParamList } from "../../utils/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import useStore from "../store/useStore";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Onboarding">;
 };
 
 const Onboarding = ({ navigation }: Props) => {
-  const [image, setImage] = useState<string | null>(null);
+  const setGalleryImage = useStore((state) => state.setGalleryImage);
+  const setCameraImage = useStore((state) => state.setCameraImage);
 
   //* function to handle image selection from gallery
   const pickImage = async () => {
@@ -21,10 +22,13 @@ const Onboarding = ({ navigation }: Props) => {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      base64: true,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
+      setGalleryImage(result.assets[0].base64);
+      setCameraImage(undefined);
+      navigation.navigate("Assessment");
     }
   };
 
@@ -34,7 +38,7 @@ const Onboarding = ({ navigation }: Props) => {
 
   return (
     <>
-      <View style={globalStyles.container}>
+      <View style={globalStyles.centerContainer}>
         <Text style={[globalStyles.boldFont, styles.name]}>
           <Text style={styles.iris}>Iris</Text>
           <Text style={styles.iris}> </Text>

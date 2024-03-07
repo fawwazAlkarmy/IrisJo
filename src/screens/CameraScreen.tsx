@@ -1,31 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { Camera, CameraType } from "expo-camera";
-import { View, Text, StyleSheet, Pressable, Image } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Colors } from "../../utils/colors";
 import * as FileSystem from "expo-file-system";
+import useStore from "../store/useStore";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../utils/types";
 
-const CameraScreen = () => {
+type Props = {
+  navigation: NativeStackNavigationProp<RootStackParamList, "Camera">;
+};
+
+const CameraScreen = ({ navigation }: Props) => {
   const [permission, requestPermission] = Camera.useCameraPermissions();
   const [cameraRef, setCameraRef] = useState<Camera | null>(null);
-  const [capturedPhotoUri, setCapturedPhotoUri] = useState<string | null>(null);
   const [isTakingPicture, setIsTakingPicture] = useState(false);
+
+  const cameraImage = useStore((state) => state.cameraImage);
+  const setCameraImage = useStore((state) => state.setCameraImage);
+  const setGalleryImage = useStore((state) => state.setGalleryImage);
 
   useEffect(() => {
     // Cleanup function to remove the captured photo when component unmounts
     return () => {
-      if (capturedPhotoUri) {
-        deletePhotoFromDevice(capturedPhotoUri);
+      if (cameraImage) {
+        deletePhotoFromDevice(cameraImage);
       }
     };
-  }, [capturedPhotoUri]);
+  }, [cameraImage]);
 
   const takePicture = async () => {
     if (cameraRef && !isTakingPicture) {
       try {
         setIsTakingPicture(true);
-        const photo = await cameraRef.takePictureAsync();
-        console.log("Photo taken:", photo.uri);
-        setCapturedPhotoUri(photo.uri); // Store the URI of the captured photo
+        const photo = await cameraRef.takePictureAsync({ base64: true });
+        console.log("Photo taken:", photo.base64);
+        setCameraImage(photo.base64); // Store the URI of the captured photo
+        setGalleryImage(undefined);
+        navigation.navigate("Assessment");
       } catch (error) {
         console.error("Failed to take picture:", error);
       } finally {
@@ -65,27 +77,17 @@ const CameraScreen = () => {
 
   return (
     <View style={styles.container}>
-      {capturedPhotoUri ? (
-        <View style={styles.previewContainer}>
-          <Image
-            source={{ uri: capturedPhotoUri }}
-            style={styles.previewImage}
-          />
-        </View>
-      ) : (
-        <Camera
-          style={styles.camera}
-          type={CameraType.back}
-          ref={(ref) => setCameraRef(ref)}
-        />
-      )}
-      {!capturedPhotoUri && (
-        <View style={styles.buttonContainer}>
-          <Pressable onPress={takePicture} style={styles.captureButton}>
-            <Text style={styles.captureButtonText}>Take Photo</Text>
-          </Pressable>
-        </View>
-      )}
+      <Camera
+        style={styles.camera}
+        type={CameraType.back}
+        ref={(ref) => setCameraRef(ref)}
+      />
+
+      <View style={styles.buttonContainer}>
+        <Pressable onPress={takePicture} style={styles.captureButton}>
+          <Text style={styles.captureButtonText}>Take Photo</Text>
+        </Pressable>
+      </View>
     </View>
   );
 };

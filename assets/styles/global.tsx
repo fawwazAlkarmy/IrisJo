@@ -14,11 +14,15 @@ export const globalStyles = StyleSheet.create({
     fontFamily: "SemiBold",
     color: Colors.text,
   },
-  container: {
+  centerContainer: {
     flex: 1,
-    // paddingTop: 70,
     paddingHorizontal: 28,
     backgroundColor: Colors.secondary,
     justifyContent: "center",
+  },
+  container: {
+    flex: 1,
+    paddingTop: 40,
+    paddingHorizontal: 28,
   },
 });
