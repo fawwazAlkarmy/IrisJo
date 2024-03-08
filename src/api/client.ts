@@ -17,8 +17,11 @@ const requests = {
 };
 
 const Plants = {
-  assessment: (options: {}) =>
-    requests.get("health_assessment", { params: options }),
+  assessment: (images: string[], similarImages: boolean) =>
+    requests.post("health_assessment", {
+      images,
+      similar_images: similarImages,
+    }),
 };
 
 const client = {

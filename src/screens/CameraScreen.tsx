@@ -6,6 +6,7 @@ import * as FileSystem from "expo-file-system";
 import useStore from "../store/useStore";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../utils/types";
+import useAssessment from "../hooks/useAssessment";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Camera">;
@@ -19,25 +20,30 @@ const CameraScreen = ({ navigation }: Props) => {
   const cameraImage = useStore((state) => state.cameraImage);
   const setCameraImage = useStore((state) => state.setCameraImage);
   const setGalleryImage = useStore((state) => state.setGalleryImage);
+  const { assessPlants, isPending } = useAssessment();
 
-  useEffect(() => {
+  /*   useEffect(() => {
     // Cleanup function to remove the captured photo when component unmounts
     return () => {
       if (cameraImage) {
         deletePhotoFromDevice(cameraImage);
       }
     };
-  }, [cameraImage]);
+  }, [cameraImage]); */
 
   const takePicture = async () => {
     if (cameraRef && !isTakingPicture) {
       try {
         setIsTakingPicture(true);
         const photo = await cameraRef.takePictureAsync({ base64: true });
-        console.log("Photo taken:", photo.base64);
-        setCameraImage(photo.base64); // Store the URI of the captured photo
-        setGalleryImage(undefined);
-        navigation.navigate("Assessment");
+        if (photo?.base64) {
+          setCameraImage(photo.base64); // Store the URI of the captured photo
+          setGalleryImage(undefined);
+          assessPlants([photo.base64], true);
+          if (!isPending) {
+            navigation.navigate("Assessment");
+          }
+        }
       } catch (error) {
         console.error("Failed to take picture:", error);
       } finally {
@@ -46,7 +52,7 @@ const CameraScreen = ({ navigation }: Props) => {
     }
   };
 
-  const deletePhotoFromDevice = async (photoUri: string) => {
+  /*   const deletePhotoFromDevice = async (photoUri: string) => {
     // Delete the photo from the device's file system
     try {
       await FileSystem.deleteAsync(photoUri);
@@ -54,7 +60,7 @@ const CameraScreen = ({ navigation }: Props) => {
     } catch (error) {
       console.error("Failed to delete photo:", error);
     }
-  };
+  }; */
 
   if (!permission) {
     // Camera permissions are still loading

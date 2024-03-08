@@ -1,4 +1,4 @@
-import { Button, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../assets/styles/global";
 import { Colors } from "../../utils/colors";
 import { AntDesign } from "@expo/vector-icons";
@@ -6,6 +6,7 @@ import * as ImagePicker from "expo-image-picker";
 import { RootStackParamList } from "../../utils/types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import useStore from "../store/useStore";
+import useAssessment from "../hooks/useAssessment";
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Onboarding">;
@@ -14,7 +15,7 @@ type Props = {
 const Onboarding = ({ navigation }: Props) => {
   const setGalleryImage = useStore((state) => state.setGalleryImage);
   const setCameraImage = useStore((state) => state.setCameraImage);
-
+  const { assessPlants, isPending } = useAssessment();
   //* function to handle image selection from gallery
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,10 +26,13 @@ const Onboarding = ({ navigation }: Props) => {
       base64: true,
     });
 
-    if (!result.canceled) {
+    if (!result.canceled && result.assets[0].base64) {
       setGalleryImage(result.assets[0].base64);
       setCameraImage(undefined);
-      navigation.navigate("Assessment");
+      assessPlants([result.assets[0].base64], true);
+      if (!isPending) {
+        navigation.navigate("Assessment");
+      }
     }
   };
 

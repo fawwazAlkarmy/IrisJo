@@ -1,7 +1,13 @@
 import { StyleSheet, Text, View } from "react-native";
 import { globalStyles } from "../../assets/styles/global";
 import { AntDesign } from "@expo/vector-icons";
-const AssessmentCard = () => {
+import { Suggestions } from "../../utils/types";
+
+type Props = {
+  item: Suggestions;
+};
+
+const AssessmentCard = ({ item }: Props) => {
   return (
     <View style={styles.card}>
       {/* line */}
@@ -11,9 +17,7 @@ const AssessmentCard = () => {
         <AntDesign name="exclamation" size={18} color="white" />
       </View>
       {/* title */}
-      <Text style={[globalStyles.regularFont, styles.title]}>
-        finished flowering period
-      </Text>
+      <Text style={[globalStyles.regularFont, styles.title]}>{item.name}</Text>
     </View>
   );
 };
